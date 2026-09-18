@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work Hours Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;600;700&family=Lato:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FDF1F4;
+    --paper-raised: #FFFFFF;
+    --ink: #4A2A34;
+    --ink-soft: #9C6B79;
+    --line: #F3C6D3;
+    --line-strong: #E8A8BC;
+    --accent: #C2617B;
+    --accent-ink: #FFFFFF;
+    --danger: #B23A48;
+    --shadow: rgba(178, 75, 107, 0.1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #2B1B22;
+      --paper-raised: #35222B;
+      --ink: #F7DCE4;
+      --ink-soft: #C99AAC;
+      --line: #4A2E39;
+      --line-strong: #5C3A47;
+      --accent: #F2A6C0;
+      --accent-ink: #3A1420;
+      --danger: #E8879A;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #2B1B22;
+    --paper-raised: #35222B;
+    --ink: #F7DCE4;
+    --ink-soft: #C99AAC;
+    --line: #4A2E39;
+    --line-strong: #5C3A47;
+    --accent: #F2A6C0;
+    --accent-ink: #3A1420;
+    --danger: #E8879A;
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Lato', -apple-system, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  body { min-height: 100vh; }
+
+  h1, h2, h3 { font-family: 'Comfortaa', 'Lato', sans-serif; font-weight: 600; margin: 0; }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+  }
+
+  header.top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  header.top .title-block h1 {
+    font-size: 32px;
+    letter-spacing: 0.2px;
+    cursor: text;
+    display: inline-block;
+    border-bottom: 1px dashed transparent;
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+  header.top .title-block h1:hover { border-bottom-color: var(--line-strong); }
+  header.top .title-block h1:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+  header.top .title-block p {
+    margin: 4px 0 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+    cursor: text;
+    display: inline-block;
+    border-bottom: 1px dashed transparent;
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+  header.top .title-block p:hover { border-bottom-color: var(--line-strong); }
+  header.top .title-block p:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  .btn {
+    font-family: inherit;
+    font-size: 15px;
+    background: var(--paper-raised);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    padding: 9px 14px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: border-color 0.15s ease, transform 0.05s ease;
+  }
+  .btn:hover { border-color: var(--ink); }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+  .btn.primary:hover { filter: brightness(1.06); }
+  .btn.ghost { background: transparent; border-color: transparent; padding: 4px 6px; color: var(--ink-soft); }
+  .btn.ghost:hover { color: var(--ink); border-color: var(--line-strong); }
+  .btn.small { padding: 5px 9px; font-size: 14px; }
+  .btn.danger-text { color: var(--danger); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px;
+    box-shadow: 0 1px 2px var(--shadow);
+  }
+  .panel + .panel { margin-top: 20px; }
+
+  .panel h2 {
+    font-size: 14px;
+    text-transform: none;
+    letter-spacing: 0.4px;
+    color: var(--ink-soft);
+    font-family: 'Comfortaa', 'Lato', sans-serif;
+    letter-spacing: 0.2px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+
+  label {
+    display: block;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .field { margin-bottom: 12px; }
+  .field-row { display: flex; gap: 8px; }
+  .field-row .field { flex: 1; }
+
+  input, select, textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    padding: 7px 8px;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+  textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+
+  .hint { font-size: 13px; color: var(--ink-soft); margin-top: -6px; margin-bottom: 12px; }
+
+  .cat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .cat-row:last-of-type { border-bottom: none; }
+  .swatch {
+    width: 13px; height: 13px; border-radius: 50%;
+    flex-shrink: 0; border: 1px solid var(--shadow);
+    cursor: pointer;
+    padding: 0;
+  }
+  .cat-row input[type="text"] {
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 3px 4px;
+    flex: 1;
+    min-width: 0;
+  }
+  .cat-row input[type="text"]:hover { border-color: var(--line-strong); }
+  .cat-row .cat-actions { display: flex; gap: 2px; }
+  .cat-row input[type="color"] {
+    width: 22px; height: 22px; padding: 0; border: none; background: none; cursor: pointer;
+  }
+
+  .add-cat-row { display: flex; gap: 8px; margin-top: 10px; }
+  .add-cat-row input { flex: 1; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  details.week-group, details.day-group { margin-bottom: 12px; }
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  .head-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .chevron { display: inline-block; font-size: 12px; color: var(--ink-soft); transition: transform 0.15s ease; flex-shrink: 0; }
+  details[open] > summary .chevron { transform: rotate(90deg); }
+
+  .week-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: color-mix(in srgb, var(--accent) 12%, var(--paper-raised));
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+  }
+  .week-head .week-name { font-family: 'Comfortaa', 'Lato', sans-serif; font-size: 18px; font-weight: 700; }
+  .week-head .week-total { font-size: 16px; font-weight: 700; }
+  details.week-group > details.day-group { margin-left: 16px; }
+
+  .day-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+  }
+  .day-head .day-name { font-family: 'Comfortaa', 'Lato', sans-serif; font-size: 18px; font-weight: 600; }
+  .day-head .day-date { color: var(--ink-soft); font-size: 14px; margin-left: 8px; }
+  .day-head .day-total { font-size: 15px; font-weight: 600; }
+
+  .entry-row {
+    display: grid;
+    grid-template-columns: 150px 68px 1fr 136px 70px;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+  .entry-row > * { min-width: 0; }
+  .entry-row:hover { background: color-mix(in srgb, var(--line) 25%, transparent); }
+  @media (max-width: 640px) {
+    .entry-row { grid-template-columns: 1fr; gap: 4px; padding: 12px 4px; }
+    .entry-row .cell-actions { justify-self: end; }
+  }
+
+  .cell-time { color: var(--ink-soft); font-size: 14px; white-space: normal; overflow-wrap: break-word; }
+  .cell-hours { font-weight: 600; }
+  .cell-task { white-space: pre-line; }
+  .cell-task ul { margin: 0; padding-left: 16px; }
+  .cell-task li { margin-bottom: 2px; }
+  .cell-task.empty { color: var(--ink-soft); font-style: normal; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    padding: 3px 9px 3px 7px;
+    border-radius: 12px;
+    border: 1px solid var(--line-strong);
+    background: var(--paper);
+    cursor: default;
+    white-space: nowrap;
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  .cell-actions { display: flex; gap: 2px; }
+
+  .edit-form {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    background: color-mix(in srgb, var(--accent) 6%, var(--paper-raised));
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 14px;
+  }
+  .edit-form .full { grid-column: 1 / -1; }
+  @media (max-width: 640px) { .edit-form { grid-template-columns: 1fr 1fr; } }
+  .edit-form .actions { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; }
+
+  #weeklyTotalsPanel { margin-top: 24px; }
+  #weekdayBreakdownPanel { margin-top: 24px; }
+  #calendarPanel { margin-top: 24px; }
+
+  .weekday-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    height: 220px;
+    padding: 20px 4px 0;
+  }
+  .weekday-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    min-width: 0;
+  }
+  .weekday-total { font-size: 14px; font-weight: 700; margin-bottom: 6px; white-space: nowrap; }
+  .weekday-bar {
+    width: 100%;
+    max-width: 56px;
+    display: flex;
+    flex-direction: column-reverse;
+    border-radius: 4px 4px 2px 2px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .weekday-bar > span { display: block; width: 100%; }
+  .weekday-label { font-size: 13px; color: var(--ink-soft); margin-top: 8px; font-weight: 600; }
+  @media (max-width: 640px) {
+    .weekday-chart { gap: 6px; height: 170px; }
+    .weekday-total { font-size: 11px; }
+    .weekday-label { font-size: 11px; }
+  }
+  .cal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cal-nav { display: flex; align-items: center; gap: 8px; }
+  .cal-month-label {
+    font-family: 'Comfortaa', 'Lato', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    min-width: 150px;
+    text-align: center;
+  }
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .cal-weekdays span {
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .cal-cell {
+    position: relative;
+    aspect-ratio: 1 / 0.82;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 6px;
+    background: var(--paper);
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .cal-cell.blank { border-color: transparent; background: transparent; }
+  .cal-cell.has-hours { cursor: pointer; }
+  .cal-cell.has-hours:hover { border-color: var(--ink-soft); }
+  .cal-cell.is-today { border-color: var(--ink); border-width: 2px; }
+  .cal-cell .cal-date { font-size: 13px; color: var(--ink-soft); }
+  .cal-cell.is-today .cal-date { color: var(--ink); font-weight: 700; }
+  .cal-cell .cal-hours { font-size: 15px; font-weight: 700; align-self: flex-end; }
+  @media (max-width: 640px) {
+    .cal-cell { aspect-ratio: auto; min-height: 44px; padding: 4px; }
+    .cal-cell .cal-hours { font-size: 13px; }
+  }
+  .cal-legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-end;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .legend-swatch {
+    width: 12px; height: 12px; border-radius: 3px;
+    background: var(--accent);
+    border: 1px solid var(--line);
+  }
+
+  #log {
+    max-height: 68vh;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  #log::-webkit-scrollbar { width: 8px; }
+  #log::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 4px; }
+  #log::-webkit-scrollbar-track { background: transparent; }
+
+  .empty-state {
+    padding: 40px 10px;
+    text-align: center;
+    color: var(--ink-soft);
+  }
+  .empty-state strong { display: block; color: var(--ink); font-family: 'Comfortaa', 'Lato', sans-serif; font-size: 20px; margin-bottom: 6px; }
+
+  .totals-list { display: flex; flex-direction: column; gap: 10px; }
+  .total-row { display: grid; grid-template-columns: 140px 1fr 68px; gap: 10px; align-items: center; font-size: 14px; }
+  .total-row > div { min-width: 0; }
+  .total-row > div:first-child { overflow-wrap: break-word; }
+  .total-row .bar-track { background: var(--line); border-radius: 3px; height: 8px; overflow: hidden; }
+  .total-row .bar-fill { height: 100%; border-radius: 3px; }
+  .total-row .bar-fill.stacked { display: flex; height: 100%; }
+  .total-row .bar-fill.stacked > span { display: block; height: 100%; }
+  .total-row .amt { text-align: right; font-weight: 600; white-space: nowrap; }
+  .grand-total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px dashed var(--line-strong); }
+  .grand-total .n { font-family: 'Comfortaa', 'Lato', sans-serif; font-size: 28px; font-weight: 700; }
+
+  ::selection { background: var(--accent); color: var(--accent-ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="title-block">
+      <h1 id="pageTitle" contenteditable="true" spellcheck="false"></h1>
+      <p id="subheading" contenteditable="true" spellcheck="false"></p>
+    </div>
+    <button class="btn" id="exportBtn" type="button">Export CSV</button>
+  </header>
+
+  <div class="layout">
+
+    <!-- LEFT COLUMN -->
+    <div class="left-col">
+      <div class="panel">
+        <h2>New entry</h2>
+        <form id="addForm">
+          <div class="field">
+            <label for="f-date">Date</label>
+            <input type="date" id="f-date" required>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="f-start">Start</label>
+              <input type="time" id="f-start">
+            </div>
+            <div class="field">
+              <label for="f-end">End</label>
+              <input type="time" id="f-end">
+            </div>
+          </div>
+          <div class="field">
+            <label for="f-hours">Hours <span style="opacity:.7">(auto-fills from start/end — edit to override)</span></label>
+            <input type="number" id="f-hours" step="0.01" min="0" placeholder="0.00">
+          </div>
+          <div class="field">
+            <label for="f-task">Task done</label>
+            <textarea id="f-task" placeholder="One line per task, e.g.&#10;Set up Qualtrics for round 1&#10;Email committee about scheduling"></textarea>
+          </div>
+          <div class="field">
+            <label for="f-cat">Category</label>
+            <select id="f-cat"></select>
+          </div>
+          <button class="btn primary" type="submit" style="width:100%">Add entry</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Categories</h2>
+        <div id="catList"></div>
+        <div class="add-cat-row">
+          <input type="text" id="newCatName" placeholder="New category name">
+          <button class="btn small" id="addCatBtn" type="button">Add</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Google Sheets sync</h2>
+        <p class="hint" style="margin-top:-4px;">
+          New entries can auto-append to your Google Sheet via a small Apps Script you connect once.
+          This only works once the page is hosted outside Claude (e.g. GitHub Pages) — see setup below.
+        </p>
+        <div class="field">
+          <label for="f-sheets-url">Apps Script Web App URL</label>
+          <input type="url" id="f-sheets-url" placeholder="https://script.google.com/macros/s/…/exec">
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn small" id="saveSheetsUrlBtn" type="button">Save</button>
+          <button class="btn small" id="resyncAllBtn" type="button">Resync all entries</button>
+        </div>
+        <div id="sheetsStatus" class="hint" style="margin-top:8px;"></div>
+        <details style="margin-top:10px;">
+          <summary style="font-size:12px; color:var(--ink-soft); cursor:pointer;">Setup instructions</summary>
+          <ol style="font-size:12px; color:var(--ink-soft); padding-left:18px; margin:8px 0;">
+            <li>Open your sheet → Extensions → Apps Script.</li>
+            <li>Delete any placeholder code and paste the script below.</li>
+            <li>Click Deploy → New deployment → type "Web app". Set "Execute as" to yourself and "Who has access" to Anyone.</li>
+            <li>Deploy, authorize when prompted, then copy the Web app URL into the field above and click Save.</li>
+          </ol>
+          <pre style="font-size:11px; background:var(--paper); border:1px solid var(--line); border-radius:4px; padding:10px; overflow-x:auto; white-space:pre;" id="appsScriptSnippet">function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  var data = JSON.parse(e.postData.contents);
+  var rows = Array.isArray(data) ? data : [data];
+  rows.forEach(function (r) {
+    sheet.appendRow([r.date, r.dayOfWeek, r.time, r.hours, r.task, r.category]);
+  });
+  return ContentService.createTextOutput(JSON.stringify({ status: "ok" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+        </details>
+      </div>
+
+      <div class="panel">
+        <h2>Totals by category</h2>
+        <div class="grand-total">
+          <span>Total logged</span>
+          <span class="n" id="grandTotal">0.0h</span>
+        </div>
+        <div class="totals-list" id="totalsList"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-col">
+      <div class="panel">
+        <h2>Log</h2>
+        <div id="log"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel" id="weeklyTotalsPanel">
+    <h2>Totals by week</h2>
+    <p class="hint" style="margin-top:-4px;">Each bar is split by category — hover a segment for details.</p>
+    <div class="totals-list" id="weeklyTotalsList"></div>
+  </div>
+
+  <div class="panel" id="weekdayBreakdownPanel">
+    <h2>Weekday breakdown</h2>
+    <p class="hint" style="margin-top:-4px;">Average hours by category for each day of the week, across all logged weeks.</p>
+    <div class="weekday-chart" id="weekdayChart"></div>
+  </div>
+
+  <div class="panel" id="calendarPanel">
+    <div class="cal-head">
+      <h2 style="border:none;margin:0;padding:0;">Calendar</h2>
+      <div class="cal-nav">
+        <button class="btn ghost small" id="calPrev" type="button" aria-label="Previous month">‹</button>
+        <span class="cal-month-label" id="calMonthLabel"></span>
+        <button class="btn ghost small" id="calNext" type="button" aria-label="Next month">›</button>
+        <button class="btn small" id="calToday" type="button">Today</button>
+      </div>
+    </div>
+    <div class="cal-weekdays" id="calWeekdays"></div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-legend">
+      <span>Less</span>
+      <span class="legend-swatch" style="opacity:.12"></span>
+      <span class="legend-swatch" style="opacity:.32"></span>
+      <span class="legend-swatch" style="opacity:.56"></span>
+      <span class="legend-swatch" style="opacity:.8"></span>
+      <span class="legend-swatch" style="opacity:1"></span>
+      <span>More</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "workHoursLog.v1";
+  // Google Sheets' default conditional-formatting "light" fill swatches —
+  // used as a starting palette so category colors feel consistent with
+  // the original spreadsheet. Adjust any of these with the color picker
+  // to match your sheet exactly.
+  var PALETTE = ["#A4C2F4", "#B7E1CD", "#FCE8B2", "#F4C7C3", "#D9D2E9", "#D0E0E3", "#FFF2CC", "#E6C9A8", "#B6D7A8", "#EAD1DC"];
+
+  var DEFAULT_STATE = {
+    title: "Work Hours Log",
+    subheading: "Every task, timed and totalled.",
+    sheetsUrl: "",
+    categories: [
+      { id: "c1", name: "Dissertation", color: "#A4C2F4" },
+      { id: "c2", name: "Teaching", color: "#D9D2E9" },
+      { id: "c3", name: "Class work", color: "#FCE8B2" },
+      { id: "c4", name: "Job market", color: "#F4C7C3" },
+      { id: "c5", name: "Volunteer", color: "#B7E1CD" },
+      { id: "c6", name: "Other", color: "#D0E0E3" }
+    ],
+    entries: []
+  };
+
+  var state = loadState();
+  var editingId = null;
+  var today = new Date();
+  var calView = { year: today.getFullYear(), month: today.getMonth() };
+
+  function hexToRgba(hex, alpha) {
+    var h = hex.replace("#", "");
+    if (h.length === 3) h = h.split("").map(function (c) { return c + c; }).join("");
+    var r = parseInt(h.substring(0, 2), 16);
+    var g = parseInt(h.substring(2, 4), 16);
+    var b = parseInt(h.substring(4, 6), 16);
+    return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      var parsed = JSON.parse(raw);
+      if (!parsed.categories || !parsed.entries) throw new Error("bad shape");
+      if (typeof parsed.subheading !== "string") parsed.subheading = DEFAULT_STATE.subheading;
+      if (typeof parsed.title !== "string") parsed.title = DEFAULT_STATE.title;
+      if (typeof parsed.sheetsUrl !== "string") parsed.sheetsUrl = DEFAULT_STATE.sheetsUrl;
+      return parsed;
+    } catch (e) {
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.error("Could not save to local storage", e);
+    }
+  }
+
+  function uid() {
+    return "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function nextPaletteColor() {
+    var used = state.categories.map(function (c) { return c.color; });
+    for (var i = 0; i < PALETTE.length; i++) {
+      if (used.indexOf(PALETTE[i]) === -1) return PALETTE[i];
+    }
+    return PALETTE[state.categories.length % PALETTE.length];
+  }
+
+  function categoryById(id) {
+    for (var i = 0; i < state.categories.length; i++) {
+      if (state.categories[i].id === id) return state.categories[i];
+    }
+    return null;
+  }
+
+  function ensureUncategorized() {
+    var existing = state.categories.filter(function (c) { return c.name.toLowerCase() === "uncategorized"; })[0];
+    if (existing) return existing.id;
+    var cat = { id: uid(), name: "Uncategorized", color: "#8A8370" };
+    state.categories.push(cat);
+    return cat.id;
+  }
+
+  function fmtHours(h) {
+    var n = Math.round((h + Number.EPSILON) * 100) / 100;
+    return n.toFixed(2).replace(/\.00$/, ".0").replace(/0$/, function (m, off, s) {
+      return s.indexOf(".") === -1 ? m : m;
+    }) + "h";
+  }
+  function fmtHoursShort(h) {
+    var n = Math.round((h + Number.EPSILON) * 100) / 100;
+    if (Number.isInteger(n)) return n + ".0h";
+    return n + "h";
+  }
+
+  function dayName(dateStr) {
+    if (!dateStr) return "";
+    var parts = dateStr.split("-");
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return d.toLocaleDateString("en-US", { weekday: "long" });
+  }
+  function dateLabel(dateStr) {
+    if (!dateStr) return "";
+    var parts = dateStr.split("-");
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
+
+  function timeToMinutes(t) {
+    if (!t) return null;
+    var parts = t.split(":");
+    return Number(parts[0]) * 60 + Number(parts[1]);
+  }
+  function fmt12h(t) {
+    if (!t) return "";
+    var parts = t.split(":");
+    var h = Number(parts[0]), m = parts[1];
+    var ampm = h >= 12 ? "PM" : "AM";
+    var h12 = h % 12; if (h12 === 0) h12 = 12;
+    return h12 + ":" + m + " " + ampm;
+  }
+  function timePeriod(t) {
+    if (!t) return null;
+    return Number(t.split(":")[0]) >= 12 ? "PM" : "AM";
+  }
+  function fmtTimeRange(start, end) {
+    if (!start && !end) return "";
+    if (start && end && timePeriod(start) === timePeriod(end)) {
+      var full = fmt12h(start);
+      var short = full.slice(0, full.length - 3); // drop the trailing " AM"/" PM"
+      return short + " – " + fmt12h(end);
+    }
+    return fmt12h(start) + (end ? " – " + fmt12h(end) : "");
+  }
+  function computeHours(start, end) {
+    var s = timeToMinutes(start), e = timeToMinutes(end);
+    if (s === null || e === null) return null;
+    var diff = e - s;
+    if (diff < 0) diff += 24 * 60;
+    return diff / 60;
+  }
+
+  function taskLines(text) {
+    return (text || "").split("\n").map(function (l) { return l.replace(/^[-•]\s*/, "").trim(); }).filter(Boolean);
+  }
+
+  // ---------- rendering ----------
+
+  function renderAll() {
+    renderSubheading();
+    renderCategorySelect();
+    renderCategoryManager();
+    renderLog();
+    renderTotals();
+    renderWeeklyTotals();
+    renderWeekdayBreakdown();
+    renderCalendar();
+  }
+
+  function renderSubheading() {
+    var el = document.getElementById("subheading");
+    if (document.activeElement !== el) el.textContent = state.subheading;
+    var titleEl = document.getElementById("pageTitle");
+    if (document.activeElement !== titleEl) titleEl.textContent = state.title;
+  }
+
+  function dailyTotals() {
+    var totals = {};
+    state.entries.forEach(function (e) {
+      totals[e.date] = (totals[e.date] || 0) + (Number(e.hours) || 0);
+    });
+    return totals;
+  }
+
+  function isoDate(y, m, d) {
+    return y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+  }
+
+  function renderCalendar() {
+    var label = document.getElementById("calMonthLabel");
+    var weekdaysEl = document.getElementById("calWeekdays");
+    var grid = document.getElementById("calGrid");
+
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    label.textContent = monthNames[calView.month] + " " + calView.year;
+
+    weekdaysEl.innerHTML = "";
+    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(function (w) {
+      var span = document.createElement("span");
+      span.textContent = w;
+      weekdaysEl.appendChild(span);
+    });
+
+    var totals = dailyTotals();
+    var firstOfMonth = new Date(calView.year, calView.month, 1);
+    var startOffset = firstOfMonth.getDay();
+    var daysInMonth = new Date(calView.year, calView.month + 1, 0).getDate();
+
+    var monthHours = [];
+    for (var d = 1; d <= daysInMonth; d++) {
+      var h = totals[isoDate(calView.year, calView.month, d)] || 0;
+      if (h > 0) monthHours.push(h);
+    }
+    var maxHours = monthHours.length ? Math.max.apply(null, monthHours) : 0;
+
+    var todayIso = isoDate(today.getFullYear(), today.getMonth(), today.getDate());
+
+    grid.innerHTML = "";
+    for (var i = 0; i < startOffset; i++) {
+      var blank = document.createElement("div");
+      blank.className = "cal-cell blank";
+      grid.appendChild(blank);
+    }
+    for (var day = 1; day <= daysInMonth; day++) {
+      var dateStr = isoDate(calView.year, calView.month, day);
+      var hours = totals[dateStr] || 0;
+      var cell = document.createElement("div");
+      cell.className = "cal-cell" + (hours > 0 ? " has-hours" : "") + (dateStr === todayIso ? " is-today" : "");
+      if (hours > 0) {
+        var alpha = maxHours > 0 ? 0.15 + (hours / maxHours) * 0.7 : 0.15;
+        cell.style.background = hexToRgba(getComputedAccent(), alpha);
+      }
+      var dateEl = document.createElement("div");
+      dateEl.className = "cal-date";
+      dateEl.textContent = day;
+      cell.appendChild(dateEl);
+      if (hours > 0) {
+        var hoursEl = document.createElement("div");
+        hoursEl.className = "cal-hours";
+        hoursEl.textContent = fmtHoursShort(hours);
+        cell.appendChild(hoursEl);
+        cell.title = fmtHoursShort(hours) + " logged";
+        cell.addEventListener("click", function (dstr) {
+          return function () {
+            var target = document.getElementById("day-" + dstr);
+            if (target) target.scrollIntoView({ behavior: "smooth", block: "center" });
+          };
+        }(dateStr));
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  function getComputedAccent() {
+    var v = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    return v || "#2F6F62";
+  }
+
+  document.getElementById("calPrev").addEventListener("click", function () {
+    calView.month -= 1;
+    if (calView.month < 0) { calView.month = 11; calView.year -= 1; }
+    renderCalendar();
+  });
+  document.getElementById("calNext").addEventListener("click", function () {
+    calView.month += 1;
+    if (calView.month > 11) { calView.month = 0; calView.year += 1; }
+    renderCalendar();
+  });
+  document.getElementById("calToday").addEventListener("click", function () {
+    calView.year = today.getFullYear();
+    calView.month = today.getMonth();
+    renderCalendar();
+  });
+
+  function renderCategorySelect() {
+    var sel = document.getElementById("f-cat");
+    var prev = sel.value;
+    sel.innerHTML = "";
+    state.categories.forEach(function (c) {
+      var opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+    if (prev && categoryById(prev)) sel.value = prev;
+  }
+
+  function renderCategoryManager() {
+    var wrap = document.getElementById("catList");
+    wrap.innerHTML = "";
+    state.categories.forEach(function (c) {
+      var row = document.createElement("div");
+      row.className = "cat-row";
+
+      var colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.value = c.color;
+      colorInput.title = "Change color";
+      colorInput.addEventListener("input", function () {
+        c.color = colorInput.value;
+        saveState();
+        renderLog();
+        renderTotals();
+        renderWeeklyTotals();
+      });
+
+      var nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.value = c.name;
+      nameInput.addEventListener("change", function () {
+        var val = nameInput.value.trim();
+        c.name = val || c.name;
+        nameInput.value = c.name;
+        saveState();
+        renderAll();
+      });
+
+      var actions = document.createElement("div");
+      actions.className = "cat-actions";
+      var delBtn = document.createElement("button");
+      delBtn.className = "btn ghost small";
+      delBtn.type = "button";
+      delBtn.textContent = "×";
+      delBtn.title = "Delete category";
+      delBtn.addEventListener("click", function () {
+        var inUse = state.entries.some(function (e) { return e.categoryId === c.id; });
+        var msg = inUse
+          ? 'Delete "' + c.name + '"? Entries using it will move to "Uncategorized".'
+          : 'Delete "' + c.name + '"?';
+        if (!confirm(msg)) return;
+        if (inUse) {
+          var fallbackId = ensureUncategorized();
+          state.entries.forEach(function (e) { if (e.categoryId === c.id) e.categoryId = fallbackId; });
+        }
+        state.categories = state.categories.filter(function (x) { return x.id !== c.id; });
+        saveState();
+        renderAll();
+      });
+      actions.appendChild(delBtn);
+
+      row.appendChild(colorInput);
+      row.appendChild(nameInput);
+      row.appendChild(actions);
+      wrap.appendChild(row);
+    });
+  }
+
+  function categoryChip(catId) {
+    var c = categoryById(catId);
+    var span = document.createElement("span");
+    span.className = "chip";
+    var dot = document.createElement("span");
+    dot.className = "dot";
+    dot.style.background = c ? c.color : "#999";
+    span.appendChild(dot);
+    span.appendChild(document.createTextNode(c ? c.name : "Uncategorized"));
+    return span;
+  }
+
+  function renderLog() {
+    var container = document.getElementById("log");
+    container.innerHTML = "";
+
+    if (state.entries.length === 0) {
+      var empty = document.createElement("div");
+      empty.className = "empty-state";
+      empty.innerHTML = "<strong>No entries yet</strong>Log your first block of time on the left.";
+      container.appendChild(empty);
+      return;
+    }
+
+    var sorted = state.entries.slice().sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+      var at = a.start || "00:00", bt = b.start || "00:00";
+      return at < bt ? 1 : (at > bt ? -1 : 0);
+    });
+
+    // group by day (preserves descending order since `sorted` is already descending)
+    var dayGroups = [];
+    var dayMap = {};
+    sorted.forEach(function (e) {
+      if (!dayMap[e.date]) {
+        dayMap[e.date] = { date: e.date, entries: [] };
+        dayGroups.push(dayMap[e.date]);
+      }
+      dayMap[e.date].entries.push(e);
+    });
+
+    // nest day groups under week groups (also preserves descending order)
+    var weekGroups = [];
+    var weekMap = {};
+    dayGroups.forEach(function (dg) {
+      var wk = weekStartIso(dg.date);
+      if (!weekMap[wk]) {
+        weekMap[wk] = { week: wk, days: [] };
+        weekGroups.push(weekMap[wk]);
+      }
+      weekMap[wk].days.push(dg);
+    });
+
+    weekGroups.forEach(function (wg) {
+      var weekTotal = wg.days.reduce(function (sum, dg) {
+        return sum + dg.entries.reduce(function (s, e) { return s + (Number(e.hours) || 0); }, 0);
+      }, 0);
+
+      var weekDetails = document.createElement("details");
+      weekDetails.className = "week-group";
+      weekDetails.open = true;
+
+      var weekSummary = document.createElement("summary");
+      weekSummary.className = "week-head";
+      weekSummary.innerHTML =
+        '<span class="head-left"><span class="chevron">▸</span><span class="week-name">' + weekLabel(wg.week) + '</span></span>' +
+        '<span class="week-total">' + fmtHoursShort(weekTotal) + '</span>';
+      weekDetails.appendChild(weekSummary);
+
+      wg.days.forEach(function (dg) {
+        var dayTotal = dg.entries.reduce(function (sum, e) { return sum + (Number(e.hours) || 0); }, 0);
+
+        var dayDetails = document.createElement("details");
+        dayDetails.className = "day-group";
+        dayDetails.id = "day-" + dg.date;
+        dayDetails.open = true;
+
+        var daySummary = document.createElement("summary");
+        daySummary.className = "day-head";
+        daySummary.innerHTML =
+          '<span class="head-left"><span class="chevron">▸</span><span><span class="day-name">' + dayName(dg.date) + '</span>' +
+          '<span class="day-date">' + dateLabel(dg.date) + '</span></span></span>' +
+          '<span class="day-total">' + fmtHoursShort(dayTotal) + '</span>';
+        dayDetails.appendChild(daySummary);
+
+        dg.entries.forEach(function (e) {
+          dayDetails.appendChild(renderEntryRow(e));
+        });
+
+        weekDetails.appendChild(dayDetails);
+      });
+
+      container.appendChild(weekDetails);
+    });
+  }
+
+  function renderEntryRow(e) {
+    if (editingId === e.id) return renderEditRow(e);
+
+    var row = document.createElement("div");
+    row.className = "entry-row";
+
+    var timeCell = document.createElement("div");
+    timeCell.className = "cell-time";
+    timeCell.textContent = (e.start || e.end) ? fmtTimeRange(e.start, e.end) : "—";
+
+    var hoursCell = document.createElement("div");
+    hoursCell.className = "cell-hours";
+    hoursCell.textContent = fmtHoursShort(Number(e.hours) || 0);
+
+    var taskCell = document.createElement("div");
+    taskCell.className = "cell-task" + (e.task && e.task.trim() ? "" : " empty");
+    var lines = taskLines(e.task);
+    if (lines.length > 1) {
+      var ul = document.createElement("ul");
+      lines.forEach(function (l) {
+        var li = document.createElement("li");
+        li.textContent = l;
+        ul.appendChild(li);
+      });
+      taskCell.appendChild(ul);
+    } else {
+      taskCell.textContent = lines[0] || "No description";
+    }
+
+    var catCell = document.createElement("div");
+    catCell.appendChild(categoryChip(e.categoryId));
+
+    var actionsCell = document.createElement("div");
+    actionsCell.className = "cell-actions";
+    var editBtn = document.createElement("button");
+    editBtn.className = "btn ghost small";
+    editBtn.type = "button";
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", function () { editingId = e.id; renderLog(); });
+    var delBtn = document.createElement("button");
+    delBtn.className = "btn ghost small danger-text";
+    delBtn.type = "button";
+    delBtn.textContent = "Delete";
+    delBtn.addEventListener("click", function () {
+      if (!confirm("Delete this entry?")) return;
+      state.entries = state.entries.filter(function (x) { return x.id !== e.id; });
+      saveState();
+      renderAll();
+    });
+    actionsCell.appendChild(editBtn);
+    actionsCell.appendChild(delBtn);
+
+    row.appendChild(timeCell);
+    row.appendChild(hoursCell);
+    row.appendChild(taskCell);
+    row.appendChild(catCell);
+    row.appendChild(actionsCell);
+    return row;
+  }
+
+  function renderEditRow(e) {
+    var row = document.createElement("div");
+    row.className = "entry-row";
+    row.style.display = "block";
+
+    var form = document.createElement("div");
+    form.className = "edit-form";
+
+    function field(labelText, inputEl) {
+      var f = document.createElement("div");
+      var l = document.createElement("label");
+      l.textContent = labelText;
+      f.appendChild(l);
+      f.appendChild(inputEl);
+      return f;
+    }
+
+    var dateInput = document.createElement("input"); dateInput.type = "date"; dateInput.value = e.date;
+    var startInput = document.createElement("input"); startInput.type = "time"; startInput.value = e.start || "";
+    var endInput = document.createElement("input"); endInput.type = "time"; endInput.value = e.end || "";
+    var hoursInput = document.createElement("input"); hoursInput.type = "number"; hoursInput.step = "0.01"; hoursInput.min = "0"; hoursInput.value = e.hours;
+
+    var catSelect = document.createElement("select");
+    state.categories.forEach(function (c) {
+      var opt = document.createElement("option");
+      opt.value = c.id; opt.textContent = c.name;
+      if (c.id === e.categoryId) opt.selected = true;
+      catSelect.appendChild(opt);
+    });
+
+    var taskArea = document.createElement("textarea");
+    taskArea.value = e.task || "";
+    taskArea.style.minHeight = "70px";
+
+    form.appendChild(field("Date", dateInput));
+    form.appendChild(field("Start", startInput));
+    form.appendChild(field("End", endInput));
+    form.appendChild(field("Hours", hoursInput));
+
+    var taskField = field("Task done", taskArea);
+    taskField.className = "full";
+    form.appendChild(taskField);
+
+    var catField = field("Category", catSelect);
+    form.appendChild(catField);
+
+    [startInput, endInput].forEach(function (inp) {
+      inp.addEventListener("change", function () {
+        var computed = computeHours(startInput.value, endInput.value);
+        if (computed !== null) hoursInput.value = Math.round(computed * 100) / 100;
+      });
+    });
+
+    var actions = document.createElement("div");
+    actions.className = "actions";
+    var cancelBtn = document.createElement("button");
+    cancelBtn.className = "btn small"; cancelBtn.type = "button"; cancelBtn.textContent = "Cancel";
+    cancelBtn.addEventListener("click", function () { editingId = null; renderLog(); });
+    var saveBtn = document.createElement("button");
+    saveBtn.className = "btn primary small"; saveBtn.type = "button"; saveBtn.textContent = "Save changes";
+    saveBtn.addEventListener("click", function () {
+      e.date = dateInput.value || e.date;
+      e.start = startInput.value || "";
+      e.end = endInput.value || "";
+      e.hours = Number(hoursInput.value) || 0;
+      e.task = taskArea.value;
+      e.categoryId = catSelect.value;
+      editingId = null;
+      saveState();
+      renderAll();
+    });
+    actions.appendChild(cancelBtn);
+    actions.appendChild(saveBtn);
+    form.appendChild(actions);
+
+    row.appendChild(form);
+    return row;
+  }
+
+  function renderTotals() {
+    var totals = {};
+    state.entries.forEach(function (e) {
+      totals[e.categoryId] = (totals[e.categoryId] || 0) + (Number(e.hours) || 0);
+    });
+    var grand = Object.keys(totals).reduce(function (s, k) { return s + totals[k]; }, 0);
+    document.getElementById("grandTotal").textContent = fmtHoursShort(grand);
+
+    var list = document.getElementById("totalsList");
+    list.innerHTML = "";
+
+    var rows = state.categories
+      .map(function (c) { return { cat: c, hours: totals[c.id] || 0 }; })
+      .filter(function (r) { return r.hours > 0; })
+      .sort(function (a, b) { return b.hours - a.hours; });
+
+    if (rows.length === 0) {
+      var e = document.createElement("div");
+      e.style.color = "var(--ink-soft)";
+      e.style.fontSize = "14px";
+      e.textContent = "Totals will appear once you log time.";
+      list.appendChild(e);
+      return;
+    }
+
+    var max = Math.max.apply(null, rows.map(function (r) { return r.hours; }));
+    rows.forEach(function (r) {
+      var row = document.createElement("div");
+      row.className = "total-row";
+      var label = document.createElement("div");
+      label.textContent = r.cat.name;
+      var track = document.createElement("div");
+      track.className = "bar-track";
+      var fill = document.createElement("div");
+      fill.className = "bar-fill";
+      fill.style.width = (max > 0 ? (r.hours / max) * 100 : 0) + "%";
+      fill.style.background = r.cat.color;
+      track.appendChild(fill);
+      var amt = document.createElement("div");
+      amt.className = "amt";
+      amt.textContent = fmtHoursShort(r.hours);
+      row.appendChild(label);
+      row.appendChild(track);
+      row.appendChild(amt);
+      list.appendChild(row);
+    });
+  }
+
+  function weekStartIso(dateStr) {
+    var parts = dateStr.split("-");
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    d.setDate(d.getDate() - d.getDay()); // back up to Sunday
+    return isoDate(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function weekLabel(weekStartStr) {
+    var sp = weekStartStr.split("-");
+    var start = new Date(Number(sp[0]), Number(sp[1]) - 1, Number(sp[2]));
+    var end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    var sameMonth = start.getMonth() === end.getMonth();
+    var startStr = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    var endStr = end.toLocaleDateString("en-US", sameMonth ? { day: "numeric" } : { month: "short", day: "numeric" });
+    var year = end.getFullYear();
+    return startStr + " – " + endStr + ", " + year;
+  }
+
+  function renderWeeklyTotals() {
+    var list = document.getElementById("weeklyTotalsList");
+    list.innerHTML = "";
+
+    var totals = {};       // week -> total hours
+    var byCategory = {};   // week -> { categoryId: hours }
+    state.entries.forEach(function (e) {
+      var wk = weekStartIso(e.date);
+      var hrs = Number(e.hours) || 0;
+      totals[wk] = (totals[wk] || 0) + hrs;
+      byCategory[wk] = byCategory[wk] || {};
+      byCategory[wk][e.categoryId] = (byCategory[wk][e.categoryId] || 0) + hrs;
+    });
+
+    var rows = Object.keys(totals)
+      .map(function (wk) { return { week: wk, hours: totals[wk], cats: byCategory[wk] }; })
+      .sort(function (a, b) { return b.week < a.week ? -1 : 1; }); // most recent first
+
+    if (rows.length === 0) {
+      var e = document.createElement("div");
+      e.style.color = "var(--ink-soft)";
+      e.style.fontSize = "14px";
+      e.textContent = "Weekly totals will appear once you log time.";
+      list.appendChild(e);
+      return;
+    }
+
+    var max = Math.max.apply(null, rows.map(function (r) { return r.hours; }));
+    rows.forEach(function (r) {
+      var row = document.createElement("div");
+      row.className = "total-row";
+      var label = document.createElement("div");
+      label.textContent = weekLabel(r.week);
+      label.style.fontSize = "13px";
+
+      var track = document.createElement("div");
+      track.className = "bar-track";
+      var fill = document.createElement("div");
+      fill.className = "bar-fill stacked";
+      fill.style.width = (max > 0 ? (r.hours / max) * 100 : 0) + "%";
+
+      // one colored segment per category, sized by its share of this week's hours
+      Object.keys(r.cats).forEach(function (catId) {
+        var cat = categoryById(catId);
+        var catHours = r.cats[catId];
+        var seg = document.createElement("span");
+        seg.style.width = (r.hours > 0 ? (catHours / r.hours) * 100 : 0) + "%";
+        seg.style.background = cat ? cat.color : "#8A8370";
+        seg.title = (cat ? cat.name : "Uncategorized") + ": " + fmtHoursShort(catHours);
+        fill.appendChild(seg);
+      });
+      track.appendChild(fill);
+
+      var amt = document.createElement("div");
+      amt.className = "amt";
+      amt.textContent = fmtHoursShort(r.hours);
+      row.appendChild(label);
+      row.appendChild(track);
+      row.appendChild(amt);
+      list.appendChild(row);
+    });
+  }
+
+  var WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  function renderWeekdayBreakdown() {
+    var chart = document.getElementById("weekdayChart");
+    chart.innerHTML = "";
+
+    if (state.entries.length === 0) {
+      var empty = document.createElement("div");
+      empty.style.color = "var(--ink-soft)";
+      empty.style.fontSize = "14px";
+      empty.textContent = "This will fill in once you log time on a few different days.";
+      chart.appendChild(empty);
+      return;
+    }
+
+    // for each weekday: distinct dates seen (denominator) and total hours per category (numerator)
+    var dateSets = [{}, {}, {}, {}, {}, {}, {}];
+    var catHoursByWeekday = [{}, {}, {}, {}, {}, {}, {}];
+
+    state.entries.forEach(function (e) {
+      var parts = e.date.split("-");
+      var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      var wd = d.getDay();
+      dateSets[wd][e.date] = true;
+      var hrs = Number(e.hours) || 0;
+      catHoursByWeekday[wd][e.categoryId] = (catHoursByWeekday[wd][e.categoryId] || 0) + hrs;
+    });
+
+    var columns = WEEKDAY_NAMES.map(function (name, wd) {
+      var dayCount = Object.keys(dateSets[wd]).length;
+      var avgByCat = {};
+      var total = 0;
+      Object.keys(catHoursByWeekday[wd]).forEach(function (catId) {
+        var avg = dayCount > 0 ? catHoursByWeekday[wd][catId] / dayCount : 0;
+        avgByCat[catId] = avg;
+        total += avg;
+      });
+      return { name: name, avgByCat: avgByCat, total: total };
+    });
+
+    var maxTotal = Math.max.apply(null, columns.map(function (c) { return c.total; }));
+
+    columns.forEach(function (col) {
+      var colEl = document.createElement("div");
+      colEl.className = "weekday-col";
+
+      var totalEl = document.createElement("div");
+      totalEl.className = "weekday-total";
+      totalEl.textContent = col.total > 0 ? fmtHoursShort(col.total) : "—";
+      colEl.appendChild(totalEl);
+
+      var bar = document.createElement("div");
+      bar.className = "weekday-bar";
+      var barHeight = maxTotal > 0 ? (col.total / maxTotal) * 180 : 0;
+      bar.style.height = barHeight + "px";
+
+      Object.keys(col.avgByCat).forEach(function (catId) {
+        var avg = col.avgByCat[catId];
+        if (avg <= 0) return;
+        var cat = categoryById(catId);
+        var seg = document.createElement("span");
+        seg.style.flexGrow = avg;
+        seg.style.background = cat ? cat.color : "#8A8370";
+        seg.title = (cat ? cat.name : "Uncategorized") + ": " + fmtHoursShort(avg) + " avg";
+        bar.appendChild(seg);
+      });
+      colEl.appendChild(bar);
+
+      var labelEl = document.createElement("div");
+      labelEl.className = "weekday-label";
+      labelEl.textContent = col.name;
+      colEl.appendChild(labelEl);
+
+      chart.appendChild(colEl);
+    });
+  }
+
+  // ---------- events ----------
+
+  var subEl = document.getElementById("subheading");
+  subEl.addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter") { ev.preventDefault(); subEl.blur(); }
+    if (ev.key === "Escape") { subEl.textContent = state.subheading; subEl.blur(); }
+  });
+  subEl.addEventListener("blur", function () {
+    var text = subEl.textContent.replace(/\s+/g, " ").trim();
+    state.subheading = text || DEFAULT_STATE.subheading;
+    subEl.textContent = state.subheading;
+    saveState();
+  });
+
+  var titleEl = document.getElementById("pageTitle");
+  titleEl.addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter") { ev.preventDefault(); titleEl.blur(); }
+    if (ev.key === "Escape") { titleEl.textContent = state.title; titleEl.blur(); }
+  });
+  titleEl.addEventListener("blur", function () {
+    var text = titleEl.textContent.replace(/\s+/g, " ").trim();
+    state.title = text || DEFAULT_STATE.title;
+    titleEl.textContent = state.title;
+    saveState();
+  });
+
+  document.getElementById("f-start").addEventListener("change", syncHoursFromTimes);
+  document.getElementById("f-end").addEventListener("change", syncHoursFromTimes);
+  function syncHoursFromTimes() {
+    var start = document.getElementById("f-start").value;
+    var end = document.getElementById("f-end").value;
+    var computed = computeHours(start, end);
+    if (computed !== null) {
+      document.getElementById("f-hours").value = Math.round(computed * 100) / 100;
+    }
+  }
+
+  document.getElementById("addForm").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var date = document.getElementById("f-date").value;
+    if (!date) { document.getElementById("f-date").focus(); return; }
+    var start = document.getElementById("f-start").value;
+    var end = document.getElementById("f-end").value;
+    var hoursField = document.getElementById("f-hours").value;
+    var hours = hoursField !== "" ? Number(hoursField) : (computeHours(start, end) || 0);
+    var task = document.getElementById("f-task").value;
+    var categoryId = document.getElementById("f-cat").value;
+
+    var newEntry = {
+      id: uid(),
+      date: date,
+      start: start,
+      end: end,
+      hours: hours,
+      task: task,
+      categoryId: categoryId
+    };
+    state.entries.push(newEntry);
+    saveState();
+
+    document.getElementById("f-start").value = "";
+    document.getElementById("f-end").value = "";
+    document.getElementById("f-hours").value = "";
+    document.getElementById("f-task").value = "";
+
+    renderAll();
+    syncEntryToSheet(newEntry);
+  });
+
+  document.getElementById("addCatBtn").addEventListener("click", function () {
+    var input = document.getElementById("newCatName");
+    var name = input.value.trim();
+    if (!name) return;
+    state.categories.push({ id: uid(), name: name, color: nextPaletteColor() });
+    input.value = "";
+    saveState();
+    renderAll();
+  });
+  document.getElementById("newCatName").addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter") { ev.preventDefault(); document.getElementById("addCatBtn").click(); }
+  });
+
+  function csvEscape(val) {
+    var s = String(val == null ? "" : val);
+    if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  document.getElementById("exportBtn").addEventListener("click", async function () {
+    var rows = [["Date", "Day of week", "Time", "Number of Hours", "Task Done", "Task Type"]];
+    var sorted = state.entries.slice().sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      return (a.start || "") < (b.start || "") ? -1 : 1;
+    });
+    sorted.forEach(function (e) {
+      var cat = categoryById(e.categoryId);
+      var timeStr = (e.start || e.end) ? (fmt12h(e.start) + (e.end ? " - " + fmt12h(e.end) : "")) : "";
+      var taskStr = taskLines(e.task).map(function (l) { return "- " + l; }).join("\n");
+      rows.push([e.date, dayName(e.date), timeStr, (Number(e.hours) || 0).toString(), taskStr, cat ? cat.name : ""]);
+    });
+    var csv = rows.map(function (r) { return r.map(csvEscape).join(","); }).join("\r\n");
+
+    var btn = document.getElementById("exportBtn");
+    var originalText = btn.textContent;
+
+    try {
+      var downloads = (window.claude && typeof window.claude.use === "function")
+        ? await window.claude.use("downloads")
+        : null;
+      if (downloads) {
+        try {
+          await downloads.save({ filename: "work-hours-log.csv", data: csv });
+          btn.textContent = "Saved";
+          setTimeout(function () { btn.textContent = originalText; }, 1500);
+          return;
+        } catch (err) {
+          if (err && err.code === "declined") return;
+          // fall through to browser download below
+        }
+      }
+    } catch (err) {
+      // fall through to browser download below
+    }
+
+    // Fallback for contexts without the downloads capability (e.g. local preview).
+    try {
+      var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = "work-hours-log.csv";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export failed", err);
+    }
+  });
+
+  // ---------- Google Sheets sync ----------
+
+  function buildSheetPayload(entry) {
+    var cat = categoryById(entry.categoryId);
+    return {
+      date: entry.date,
+      dayOfWeek: dayName(entry.date),
+      time: fmtTimeRange(entry.start, entry.end),
+      hours: Number(entry.hours) || 0,
+      task: taskLines(entry.task).join("; "),
+      category: cat ? cat.name : ""
+    };
+  }
+
+  function setSheetsStatus(text) {
+    var el = document.getElementById("sheetsStatus");
+    if (el) el.textContent = text;
+  }
+
+  function syncEntryToSheet(entry) {
+    if (!state.sheetsUrl) return;
+    fetch(state.sheetsUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(buildSheetPayload(entry))
+    }).then(function () {
+      setSheetsStatus("Synced to Google Sheets.");
+    }).catch(function (err) {
+      console.error("Sheets sync failed", err);
+      setSheetsStatus("Sync failed — check the Web App URL and that this page is hosted outside Claude.");
+    });
+  }
+
+  document.getElementById("f-sheets-url").value = state.sheetsUrl || "";
+
+  document.getElementById("saveSheetsUrlBtn").addEventListener("click", function () {
+    var url = document.getElementById("f-sheets-url").value.trim();
+    state.sheetsUrl = url;
+    saveState();
+    setSheetsStatus(url ? "Saved. New entries will try to sync automatically." : "Sync disabled — no URL set.");
+  });
+
+  document.getElementById("resyncAllBtn").addEventListener("click", function () {
+    if (!state.sheetsUrl) { setSheetsStatus("Add and save a Web App URL first."); return; }
+    if (state.entries.length === 0) { setSheetsStatus("No entries to sync yet."); return; }
+    var payload = state.entries.map(buildSheetPayload);
+    setSheetsStatus("Sending " + payload.length + " entries…");
+    fetch(state.sheetsUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    }).then(function () {
+      setSheetsStatus("Sent " + payload.length + " entries — check your sheet to confirm.");
+    }).catch(function (err) {
+      console.error("Bulk sync failed", err);
+      setSheetsStatus("Sync failed — check the Web App URL and that this page is hosted outside Claude.");
+    });
+  });
+
+  // default the date field to today
+  (function setToday() {
+    var d = new Date();
+    var iso = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    document.getElementById("f-date").value = iso;
+  })();
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
